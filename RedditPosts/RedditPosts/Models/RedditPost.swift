@@ -9,6 +9,7 @@ import Foundation
 
 struct RedditPost: Decodable {
     struct Data: Decodable {
+        let id: String
         let title: String
         let thumbnail: String?
         let thumbnail_width: Int?
