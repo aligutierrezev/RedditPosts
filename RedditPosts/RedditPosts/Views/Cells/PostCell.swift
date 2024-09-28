@@ -18,6 +18,8 @@ class PostCell: UITableViewCell {
     private var currentImageURL: URL?
     private let imageDownloader = ImageDownloader()
     private var imageHeightConstraint: NSLayoutConstraint?
+    private var imageWidthConstraint: NSLayoutConstraint?
+    private let invalidThumbailImage = ["default", "self", "image", ""]
 
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -39,7 +41,9 @@ class PostCell: UITableViewCell {
         currentImageTask?.cancel()
         currentImageTask = nil
         imageHeightConstraint?.isActive = false
+        imageWidthConstraint?.isActive = false
         imageHeightConstraint = nil
+        imageWidthConstraint = nil
     }
 
     private func setupUI() {
@@ -47,7 +51,7 @@ class PostCell: UITableViewCell {
         titleLabel.font = UIFont.boldSystemFont(ofSize: 16)
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
-        thumbnailImageView.contentMode = .scaleAspectFill
+        thumbnailImageView.contentMode = .scaleAspectFit
         thumbnailImageView.clipsToBounds = true
         thumbnailImageView.isHidden = true
         thumbnailImageView.translatesAutoresizingMaskIntoConstraints = false
@@ -76,7 +80,6 @@ class PostCell: UITableViewCell {
             
             thumbnailImageView.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 8),
             thumbnailImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
-            thumbnailImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -8),
             
             horizontalStackView.topAnchor.constraint(equalTo: thumbnailImageView.bottomAnchor, constant: 8),
             horizontalStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 8),
@@ -89,15 +92,17 @@ class PostCell: UITableViewCell {
         titleLabel.text = post.title
         upvotesLabel.text = "Upvotes: \(post.ups)"
         commentsLabel.text = "Comments: \(post.num_comments)"
-        
-        if let thumbnailURLString = post.thumbnail, let url = URL(string: thumbnailURLString) {
+
+        if let thumbnailURLString = post.thumbnail,
+           !invalidThumbailImage.contains(thumbnailURLString),
+           let url = URL(string: thumbnailURLString) {
             currentImageURL = url
             let nsURL = url as NSURL
             
             if let cachedImage = ImageCache.shared.getImage(for: nsURL) {
                 thumbnailImageView.image = cachedImage
                 thumbnailImageView.isHidden = false
-                setImageAspectRatio(post: post)
+                setImageConstraints(for: post)
             } else {
                 thumbnailImageView.isHidden = true
                 currentImageTask = imageDownloader.downloadImage(from: url) { [weak self] image in
@@ -108,7 +113,7 @@ class PostCell: UITableViewCell {
                         if self.currentImageURL == url {
                             self.thumbnailImageView.image = image
                             self.thumbnailImageView.isHidden = false
-                            self.setImageAspectRatio(post: post)
+                            self.setImageConstraints(for: post)
                             self.updateCellLayout()
                         }
                     }
@@ -116,18 +121,16 @@ class PostCell: UITableViewCell {
             }
         } else {
             thumbnailImageView.isHidden = true
+            imageHeightConstraint?.isActive = false
+            imageWidthConstraint?.isActive = false
         }
     }
 
-    private func setImageAspectRatio(post: RedditPost.Data) {
-        imageHeightConstraint?.isActive = false
-        
-        if let thumbnailWidth = post.thumbnail_width, let thumbnailHeight = post.thumbnail_height {
-            let aspectRatio = CGFloat(thumbnailHeight) / CGFloat(thumbnailWidth)
-            
-            imageHeightConstraint = thumbnailImageView.heightAnchor.constraint(equalTo: thumbnailImageView.widthAnchor, multiplier: aspectRatio)
-            imageHeightConstraint?.isActive = true
-        }
+    private func setImageConstraints(for post: RedditPost.Data) {
+        imageHeightConstraint = thumbnailImageView.heightAnchor.constraint(equalToConstant: CGFloat(post.thumbnail_height ?? 0))
+        imageWidthConstraint = thumbnailImageView.widthAnchor.constraint(equalToConstant: 150)
+        imageHeightConstraint?.isActive = true
+        imageWidthConstraint?.isActive = true
     }
 
     private func updateCellLayout() {

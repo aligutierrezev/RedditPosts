@@ -21,4 +21,3 @@ class ImageCache {
         cache.setObject(image, forKey: url)
     }
 }
-

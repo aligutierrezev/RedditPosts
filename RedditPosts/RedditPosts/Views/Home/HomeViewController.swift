@@ -7,6 +7,7 @@
 
 import UIKit
 import Combine
+import SwiftUI
 
 class HomeViewController: UIViewController {
     
@@ -74,8 +75,8 @@ class HomeViewController: UIViewController {
     }
     
     @objc private func refreshData() {
-            viewModel.fetchPosts()
-        }
+        viewModel.fetchPosts()
+    }
     
     private func showError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
@@ -98,18 +99,20 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // TODO: link to detail View
+        let post = viewModel.posts[indexPath.row]
+        let detailsViewModel = DetailsViewModel(post: post)
+        let detailsViewController = UIHostingController(rootView: DetailsView(viewModel: detailsViewModel))
+        navigationController?.pushViewController(detailsViewController, animated: true)
     }
 }
 
 extension HomeViewController: UITableViewDataSourcePrefetching {
     func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-            let urls = indexPaths.compactMap { indexPath -> URL? in
-                guard indexPath.row < posts.count else { return nil }
-                return URL(string: posts[indexPath.row].thumbnail ?? "")
-            }
-
-            ImagePrefetcher.shared.prefetch(urls: urls)
+        let urls = indexPaths.compactMap { indexPath -> URL? in
+            guard indexPath.row < posts.count else { return nil }
+            return URL(string: posts[indexPath.row].thumbnail ?? "")
         }
-    
+        
+        ImagePrefetcher.shared.prefetch(urls: urls)
+    }
 }
