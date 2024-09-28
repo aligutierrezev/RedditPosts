@@ -9,7 +9,7 @@ import Foundation
 import Combine
 
 class HomeViewModel: ObservableObject {
-    private let networkClient: NetworkClient
+    let networkClient: NetworkClient
     private var cancellables = Set<AnyCancellable>()
     
     @Published var posts: [RedditPost.Data] = []

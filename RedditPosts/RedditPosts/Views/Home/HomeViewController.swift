@@ -100,7 +100,7 @@ extension HomeViewController: UITableViewDataSource, UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let post = viewModel.posts[indexPath.row]
-        let detailsViewModel = DetailsViewModel(post: post)
+        let detailsViewModel = DetailsViewModel(post: post, networkClient: viewModel.networkClient)
         let detailsViewController = UIHostingController(rootView: DetailsView(viewModel: detailsViewModel))
         navigationController?.pushViewController(detailsViewController, animated: true)
     }

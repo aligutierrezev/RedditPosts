@@ -9,6 +9,18 @@ import Foundation
 
 struct RedditPost: Decodable {
     struct Data: Decodable {
+        struct Preview: Decodable {
+            struct Image: Decodable {
+                struct Source: Decodable {
+                    let url: String
+                    let width: Int
+                    let height: Int
+                }
+                let source: Source
+            }
+            let images: [Image]
+        }
+
         let id: String
         let title: String
         let thumbnail: String?
@@ -18,6 +30,7 @@ struct RedditPost: Decodable {
         let num_comments: Int
         let ups: Int
         let selftext: String?
+        let preview: Preview?
     }
     
     let data: Data

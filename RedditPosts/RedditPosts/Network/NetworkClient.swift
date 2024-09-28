@@ -16,8 +16,18 @@ enum HTTPMethod: String {
     case patch = "PATCH"
 }
 
-enum RedditAPIPath: String {
-    case root = "/.json"
+enum RedditAPIPath {
+    case root
+    case comments(postId: String)
+
+    var rawValue: String {
+        switch self {
+        case .root:
+            return "/.json"
+        case .comments(let postId):
+            return "/comments/\(postId).json"
+        }
+    }
 }
 
 protocol Request {
