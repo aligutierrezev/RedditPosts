@@ -13,16 +13,16 @@ struct DetailsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                if let thumbnailURL = viewModel.post.thumbnail, let url = URL(string: thumbnailURL) {
+                if let thumbnailURL = viewModel.post.url_overridden_by_dest, let url = URL(string: thumbnailURL) {
                     AsyncImage(url: url) { phase in
                         switch phase {
                         case .empty:
-                            ProgressView() // Show a progress view while loading
+                            ProgressView()
                         case .success(let image):
                             image
-                                .resizable()  // Apply resizable to the Image
-                                .scaledToFit() // Scale the image to fit within the frame
-                                .frame(width: CGFloat(400), height: CGFloat(400))
+                                .resizable()
+                                .scaledToFit()
+                                .frame(maxWidth: .infinity)
                         case .failure(_):
                             EmptyView()
                         @unknown default:

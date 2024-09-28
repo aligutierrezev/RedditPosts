@@ -12,6 +12,7 @@ struct RedditPost: Decodable {
         let id: String
         let title: String
         let thumbnail: String?
+        let url_overridden_by_dest: String?
         let thumbnail_width: Int?
         let thumbnail_height: Int?
         let num_comments: Int
