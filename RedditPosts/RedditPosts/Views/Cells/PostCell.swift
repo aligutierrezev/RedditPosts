@@ -50,7 +50,7 @@ class PostCell: UITableViewCell {
         // Title Label
         titleLabel.numberOfLines = 0
         titleLabel.font = UIFont.boldSystemFont(ofSize: 18)
-        titleLabel.textColor = .black
+        titleLabel.textColor = .label
         titleLabel.translatesAutoresizingMaskIntoConstraints = false
         
         // Thumbnail Image View
